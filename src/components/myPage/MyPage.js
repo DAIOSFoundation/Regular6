@@ -142,7 +142,7 @@ class MyPage extends Component {
 
                     <View style={styles.qrcodeView}>
                         <QRCode
-                            value="http://awesome.link.qr"
+                            value="adsf123"
                             logoSize={500}
                             // logoBackgroundColor='transparent'
                         />
