@@ -10,6 +10,7 @@ import ReservationCompleteScreen from './reservation/ReservationCompleteScreen';
 import ContactListScreen from './contactlist/ContactListScreen';
 import MyPageScreen from './myPage/MyPageScreen';
 import MyPageReservationConfirmScreen from './myPage/MyPageReservationConfirmScreen';
+import LoginScreen from './login/LoginScreen';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -45,6 +46,7 @@ class Index extends Component {
                         <Scene key='Home' title='Home'
                                icon={tabBarIcon}
                         >
+                            {/*<Scene key='LoginScreen' component={LoginScreen} title='레귤러식스'/>*/}
                             <Scene key='homeScreen' component={HomeScreen} title='레귤러식스'/>
                             <Scene key='homeDetailScreen' component={HomeDetailScreen} title='레귤러식스' backTitle=" "
                                    hideTabBar={true}
