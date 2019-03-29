@@ -9,15 +9,15 @@ import {
 import {Button, Spinner} from 'native-base';
 import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
-import * as myPageReservationConfirmActions from '../../store/modules/myPage/myPage';
-import NothingToShow from "../../components/common/FixedAlert";
+import * as myPageReservationHistoryActions from '../../store/modules/myPage/myPage';
+import NothingToShow from '../../components/common/FixedAlert';
 
-class MyPageReservationConfirm extends Component {
+class MyPageReservationHistory extends Component {
 
     initialize = async () => {
-        const {MyPageReservationConfirmActions} = this.props;
+        const {MyPageReservationHistoryActions} = this.props;
         try {
-            await MyPageReservationConfirmActions.read_myReservation()
+            await MyPageReservationHistoryActions.read_myReservation()
         } catch (e) {
 
             console.log("myPageReservationConfirm error : ", e)
@@ -97,7 +97,7 @@ class MyPageReservationConfirm extends Component {
             )
         }else{
             return(
-                <NothingToShow  icon="alert-circle-outline" text1="예약한 내용이" text2="없습니다."/>
+                <NothingToShow  icon="alert-circle-outline" text1="지난 예약이" text2="없습니다."/>
             )
         }
     }
@@ -242,6 +242,6 @@ export default connect(
         loading: state.pender.pending['myPageReservationConfirm/READ_MY_RESERVATION']
     }),
     (dispatch) => ({
-        MyPageReservationConfirmActions: bindActionCreators(myPageReservationConfirmActions, dispatch)
+        MyPageReservationHistoryActions: bindActionCreators(myPageReservationHistoryActions, dispatch)
     })
-)(MyPageReservationConfirm);
+)(MyPageReservationHistory);
