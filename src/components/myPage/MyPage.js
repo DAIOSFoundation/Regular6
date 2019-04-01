@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, AppRegistry, TextInput, Alert} from "react-native";
-import {Button, CardItem, Icon} from "native-base";
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Button, CardItem, Icon, Spinner, Input} from "native-base";
 import {Actions} from "react-native-router-flux";
 import Modal from "react-native-modal";
 import QRCode from 'react-native-qrcode-svg';
@@ -19,12 +19,25 @@ class MyPage extends Component {
     _toggleModal = () =>
         this.setState({isModalVisible: !this.state.isModalVisible});
 
-    initialize = async() => {
+    handleSubmitPinNumer = ()=>{
+      const {MyPageActions,pinNumber}=this.props;
+      console.log("submitPinNumber : ",pinNumber);
+      MyPageActions.submit_pinNumber(pinNumber)
+    };
+
+    handleChangePinNumber=(pinNumber)=>{
+      const {MyPageActions}=this.props;
+      console.log("change pinNUmber : ",pinNumber);
+      MyPageActions.change_pinNumber(pinNumber);
+    };
+
+    initialize = async () => {
         const {MyPageActions} = this.props;
         try {
             await MyPageActions.read_myInfo()
         } catch (e) {
-            console.log("mypage error : ",e)
+
+            console.log("mypage error : ", e)
         }
     }
 
@@ -34,128 +47,212 @@ class MyPage extends Component {
 
 
     render() {
-        const {gradeLevel, chargingAmount, remainingAmount, usedAmount, loading} = this.props;
-        return (
+        const {gradeLevel, chargingAmount, remainingAmount, usedAmount,pinNumber, visibleMembershipAmountView, loading} = this.props;
 
-            <ScrollView style={styles.container}>
-                <View>
-                    <View style={styles.header}>
-                        <View style={styles.headerContent}>
-                            <Image style={styles.avatar}
-                                   source={{uri: 'https://bootdey.com/img/Content/avatar/avatar2.png'}}/>
-                            <Text style={styles.name}>
-                                Tion76{loading}
-                            </Text>
+        if (loading) return <Spinner color="black" style={styles.spinner}/>;
 
+
+        if (visibleMembershipAmountView) {
+            return (
+                <ScrollView style={styles.container}>
+                    <View>
+                        <View style={styles.header}>
+                            <View style={styles.headerContent}>
+                                <Image style={styles.avatar}
+                                       source={{uri: 'https://bootdey.com/img/Content/avatar/avatar2.png'}}/>
+                                <Text style={styles.name}>
+                                    Tion76
+                                </Text>
+
+                            </View>
+
+                            <CardItem style={styles.cardItemContainer}>
+                                <View style={[styles.viewContainer, styles.iconBorder]}>
+                                    <Icon2 name="card-membership" style={[styles.icon, styles.margin]}/>
+                                    <Text style={styles.textMenuSubTitle}>포인트</Text>
+                                    <Text style={styles.textMenuSubTitle}>{remainingAmount}</Text>
+                                </View>
+
+                                <View style={[styles.viewContainer, styles.iconBorder]}>
+                                    <Icon2 name="star" style={[styles.icon, styles.margin]}/>
+                                    <Text style={styles.textMenuSubTitle}>등급</Text>
+                                    <Text style={styles.textMenuSubTitle}>{gradeLevel}</Text>
+                                </View>
+
+                                <View style={styles.viewContainer}>
+                                    <Icon2 name="assignment-ind" style={[styles.icon, styles.margin]}/>
+                                    <Text style={styles.textMenuSubTitle}>방문내역</Text>
+                                    <Text style={styles.textMenuSubTitle}>12회</Text>
+                                </View>
+                            </CardItem>
                         </View>
 
-                        <CardItem style={styles.cardItemContainer}>
-                            <View style={[styles.viewContainer, styles.iconBorder]}>
-                                <Icon2 name="card-membership" style={[styles.icon, styles.margin]}/>
-                                <Text style={styles.textMenuSubTitle}>포인트</Text>
-                                <Text style={styles.textMenuSubTitle}>300</Text>
-                            </View>
-
-                            <View style={[styles.viewContainer, styles.iconBorder]}>
-                                <Icon2 name="star" style={[styles.icon, styles.margin]}/>
-                                <Text style={styles.textMenuSubTitle}>등급</Text>
-                                <Text style={styles.textMenuSubTitle}>{gradeLevel}</Text>
-                            </View>
-
-                            <View style={styles.viewContainer}>
-                                <Icon2 name="assignment-ind" style={[styles.icon, styles.margin]}/>
-                                <Text style={styles.textMenuSubTitle}>방문내역</Text>
-                                <Text style={styles.textMenuSubTitle}>12회</Text>
-                            </View>
-                        </CardItem>
-                    </View>
-
-                    {/*ㅇㅖ약내역*/}
-                    <View style={styles.card}>
-
-                        <Text style={styles.reservationTitle}>예약 내역</Text>
-                        <View style={styles.cardFooter}>
-                            <TouchableOpacity onPress={() => Actions.myPageReservationConfirmScreen()}>
-                                <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}>예약 확인 </Text>
-                            </TouchableOpacity>
-                            <Text> | </Text>
-                            <TouchableOpacity onPress={() => Actions.myPageReservationConfirmScreen()}>
-                                <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}> 지난 예약</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    {/*멤버십*/}
-                    <Text style={styles.membershipTitle}>멤버십</Text>
-                    {/*pin 입력*/}
-                    {/*<View style={styles.membershipCard}>*/}
-                    {/*<View style={styles.pinDetail}>*/}
-                    {/*<View style={styles.pinContent}>*/}
-                    {/*<View style={styles.inputContainer}>*/}
-                    {/*<TextInput style={styles.inputs}*/}
-                    {/*placeholder="N자리의 PIN 번호를 입력해주세요."*/}
-                    {/*underlineColorAndroid='transparent'/>*/}
-                    {/*</View>*/}
-                    {/*</View>*/}
-
-                    {/*<View style={styles.pinContent}>*/}
-                    {/*<Button bordered block style={styles.membershipButton}>*/}
-                    {/*<Text> 입력 </Text>*/}
-                    {/*</Button>*/}
-                    {/*</View>*/}
-                    {/*</View>*/}
-                    {/*</View>*/}
-
-                    {/*금액 뷰*/}
-                    <View style={styles.membershipAmount}>
-                        <View style={styles.amountContent}>
+                        {/*ㅇㅖ약내역*/}
+                        <View style={styles.card}>
+                            <Text style={styles.reservationTitle}>예약 내역</Text>
                             <View style={styles.cardFooter}>
-                                <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}>충전 금액 </Text>
-                                <Text style={[styles.reservationLabel, styles.textMenuSubTitle2]}>300,000원</Text>
-                            </View>
-                            <View style={styles.cardFooter}>
-                                <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}>사용 금액 </Text>
-                                <Text style={[styles.reservationLabel, styles.textMenuSubTitle2]}>300,000원</Text>
-                            </View>
-                            <View style={styles.cardFooter}>
-                                <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}>남은 금액 </Text>
-                                <Text style={[styles.reservationLabel, styles.textMenuSubTitle2]}>300,000원</Text>
+                                <TouchableOpacity onPress={() => Actions.myPageReservationConfirmScreen()}>
+                                    <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}>예약 확인 </Text>
+                                </TouchableOpacity>
+                                <Text> | </Text>
+                                <TouchableOpacity onPress={() => Actions.myPageReservationHistoryScreen()}>
+                                    <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}> 지난 예약</Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
-                        <View style={styles.amountContent}>
-                            <Button bordered block style={styles.qrcodeButton} onPress={this._toggleModal}>
-                                <Text style={styles.qrcodeText}>QR 코드</Text>
-                            </Button>
+
+                        {/*멤버십*/}
+                        <Text style={styles.membershipTitle}>멤버십</Text>
+
+
+                        {/*금액 뷰*/}
+                        <View style={styles.membershipAmount}>
+                            <View style={styles.amountContent}>
+                                <View style={styles.cardFooter}>
+                                    <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}>충전 금액 </Text>
+                                    <Text
+                                        style={[styles.reservationLabel, styles.textMenuSubTitle2]}>{chargingAmount}원</Text>
+                                </View>
+                                <View style={styles.cardFooter}>
+                                    <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}>사용 금액 </Text>
+                                    <Text
+                                        style={[styles.reservationLabel, styles.textMenuSubTitle2]}>{usedAmount}원</Text>
+                                </View>
+                                <View style={styles.cardFooter}>
+                                    <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}>남은 금액 </Text>
+                                    <Text
+                                        style={[styles.reservationLabel, styles.textMenuSubTitle2]}>{remainingAmount}원</Text>
+                                </View>
+                            </View>
+                            <View style={styles.amountContent}>
+                                <Button bordered block style={styles.qrcodeButton} onPress={this._toggleModal}>
+                                    <Text style={styles.qrcodeText}>QR 코드</Text>
+                                </Button>
+                            </View>
                         </View>
+
+
                     </View>
 
-
-                </View>
-
-                <Modal style={styles.modalView} isVisible={this.state.isModalVisible}>
-                    {/*<View style={{ flex: 1 }}>*/}
+                    <Modal style={styles.modalView} isVisible={this.state.isModalVisible}>
+                        {/*<View style={{ flex: 1 }}>*/}
 
 
-                    <TouchableOpacity onPress={this._toggleModal}>
-                        <Text style={styles.cancelBtn}>X</Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity onPress={this._toggleModal}>
+                            <Text style={styles.cancelBtn}>X</Text>
+                        </TouchableOpacity>
 
-                    <View style={styles.qrcodeView}>
-                        <QRCode
-                            value="adsf123"
-                            logoSize={500}
-                            // logoBackgroundColor='transparent'
-                        />
-                        <Text>QRCODE</Text>
+                        <View style={styles.qrcodeView}>
+                            <QRCode
+                                value="http://awesome.link.qr"
+                                logoSize={500}
+                                // logoBackgroundColor='transparent'
+                            />
+                            <Text>QRCODE</Text>
+                        </View>
+
+
+                        {/*</View>*/}
+                    </Modal>
+
+                </ScrollView>
+            )
+        } else {
+            return (
+                <ScrollView style={styles.container}>
+                    <View>
+                        <View style={styles.header}>
+                            <View style={styles.headerContent}>
+                                <Image style={styles.avatar}
+                                       source={{uri: 'https://bootdey.com/img/Content/avatar/avatar2.png'}}/>
+                                <Text style={styles.name}>
+                                    Tion76
+                                </Text>
+
+                            </View>
+
+                            <CardItem style={styles.cardItemContainer}>
+                                <View style={[styles.viewContainer, styles.iconBorder]}>
+                                    <Icon2 name="card-membership" style={[styles.icon, styles.margin]}/>
+                                    <Text style={styles.textMenuSubTitle}>포인트</Text>
+                                    <Text style={styles.textMenuSubTitle}>{remainingAmount}</Text>
+                                </View>
+
+                                <View style={[styles.viewContainer, styles.iconBorder]}>
+                                    <Icon2 name="star" style={[styles.icon, styles.margin]}/>
+                                    <Text style={styles.textMenuSubTitle}>등급</Text>
+                                    <Text style={styles.textMenuSubTitle}>{gradeLevel}</Text>
+                                </View>
+
+                                <View style={styles.viewContainer}>
+                                    <Icon2 name="assignment-ind" style={[styles.icon, styles.margin]}/>
+                                    <Text style={styles.textMenuSubTitle}>방문내역</Text>
+                                    <Text style={styles.textMenuSubTitle}>12회</Text>
+                                </View>
+                            </CardItem>
+                        </View>
+
+                        {/*ㅇㅖ약내역*/}
+                        <View style={styles.card}>
+                            <Text style={styles.reservationTitle}>예약 내역</Text>
+                            <View style={styles.cardFooter}>
+                                <TouchableOpacity onPress={() => Actions.myPageReservationConfirmScreen()}>
+                                    <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}>예약 확인 </Text>
+                                </TouchableOpacity>
+                                <Text> | </Text>
+                                <TouchableOpacity onPress={() => Actions.myPageReservationHistoryScreen()}>
+                                    <Text style={[styles.reservationLabel, styles.textMenuSubTitle]}> 지난 예약</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        {/*멤버십*/}
+                        <Text style={styles.membershipTitle}>멤버십</Text>
+
+                        {/*pin 입력*/}
+                        <View style={styles.membershipCard}>
+                            <View style={styles.pinDetail}>
+                                <View style={styles.pinContent}>
+                                    <View style={styles.inputContainer}>
+                                        <Input style={styles.inputs}
+                                                   onChangeText={(pinNumber)=>this.handleChangePinNumber(pinNumber)}
+                                                   placeholder="N자리의 PIN 번호를 입력해주세요."
+                                                   underlineColorAndroid='transparent'/>
+                                    </View>
+                                </View>
+
+                                <View style={styles.pinContent}>
+                                    <Button bordered block style={styles.membershipButton} onPress={()=>
+                                    this.handleSubmitPinNumer()}>
+                                        <Text> 입력 </Text>
+                                    </Button>
+                                </View>
+                            </View>
+                        </View>
+
                     </View>
 
+                    <Modal style={styles.modalView} isVisible={this.state.isModalVisible}>
+                        {/*<View style={{ flex: 1 }}>*/}
+                        <TouchableOpacity onPress={this._toggleModal}>
+                            <Text style={styles.cancelBtn}>X</Text>
+                        </TouchableOpacity>
 
-                    {/*</View>*/}
-                </Modal>
+                        <View style={styles.qrcodeView}>
+                            <QRCode
+                                value="http://awesome.link.qr"
+                                logoSize={500}
+                                // logoBackgroundColor='transparent'
+                            />
+                            <Text>QRCODE</Text>
+                        </View>
+                        {/*</View>*/}
+                    </Modal>
 
-            </ScrollView>
+                </ScrollView>
 
-        )
+            )
+        }
     }
 }
 
@@ -318,7 +415,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 14,
         marginLeft: 16,
-        color: "#d8d8d8",
+        color: "black",
         fontWeight: '600',
         // height:45,
         // borderBottomColor: '#d8d8d8',
@@ -432,6 +529,11 @@ const styles = StyleSheet.create({
     textMenuSubTitle2: {
         fontSize: 12,
         color: '#202123'
+    },
+    spinner: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
     }
 
 });
@@ -441,7 +543,11 @@ export default connect(
         chargingAmount: state.myPage.get('chargingAmount'),
         remainingAmount: state.myPage.get('remainingAmount'),
         usedAmount: state.myPage.get('usedAmount'),
-        loading: state.pender.pending['myPage/READ_MYINFO']
+        pinNumber :state.myPage.get('pinNumber'),
+        visibleMembershipAmountView: state.myPage.get('visibleMembershipAmountView'),
+        loading: state.pender.pending['myPage/READ_MYINFO'],
+        error: state.pender.failure['myPage/READ_MYINFO'],
+
     }),
     (dispatch) => ({
         MyPageActions: bindActionCreators(myPageActions, dispatch)

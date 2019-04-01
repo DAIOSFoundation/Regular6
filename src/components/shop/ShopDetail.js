@@ -5,8 +5,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Modal from 'react-native-modal';
 import {Actions} from 'react-native-router-flux';
 // import Modals from '../../components/common/Modals';
+import {connect} from 'react-redux';
 import PreventDoubleClick from '../common/PreventDoubleClick';
-
+import {bindActionCreators} from "redux";
+import * as shopActions from '../../store/modules/shop/shop';
 const TouchableWithoutFeedback2 = PreventDoubleClick(TouchableWithoutFeedback);
 
 class ShopDetail extends Component {
@@ -14,42 +16,26 @@ class ShopDetail extends Component {
         uri: 'https://cdn.pixabay.com/photo/2015/06/30/18/36/st-826688_1280.jpg',
         uri2: 'https://cdn.pixabay.com/photo/2016/08/28/22/02/restaurant-1626983_1280.jpg',
         uri3: 'https://cdn.pixabay.com/photo/2014/04/26/00/41/dining-room-332207_1280.jpg',
-        visibleModal: false
     };
-    // loadModal = () => {
-    //     this.setState({visibleModal:true});
-    //     console.log("change",this.state.visibleModal)
-    // };
 
-    renderModalContent = () => (
-        <View style={styles.modalContent}>
-            <Text>식당에 전화하시겠습니까?</Text>
-            <View style={styles.buttonContainer}>
-                <Button transparent dark onPress={() => this.setState({visibleModal: null})}
-                        style={styles.buttonCancel}>
-                    <Text style={styles.cardSubText}>취소하기</Text>
-                </Button>
-                <Button transparent dark
-                        onPress={() => Linking.openURL('tel:010-1234-5678').then(this.setState({visibleModal: null}))}
-                        style={styles.buttonCall}>
-                    <Text style={styles.cardSubText}>전화하기</Text>
-                </Button>
-            </View>
-        </View>
-    );
+    handleToggleModal=(visible)=>{
+        const {ShopActions} =this.props;
+        ShopActions.toggle_modal(visible)
+    }
 
     render() {
+        const {shopNames, shopUri, shopIntroduction, visibleModal} =this.props;
         return (
             <ScrollView>
                 <Content>
                     <Card>
                         <CardItem cardBody>
-                            <Image source={{uri: this.state.uri}} style={styles.image}/>
+                            <Image source={shopUri} style={styles.image}/>
                         </CardItem>
                         <CardItem style={styles.margin}>
                             <Body>
                             <Text style={styles.margin}>
-                                <Text style={styles.textMenuTitle}>조선횟집</Text>
+                                <Text style={styles.textMenuTitle}>{shopNames}</Text>
                             </Text>
                             <Text>
                                 <Text style={styles.textMenuSubTitle}>#만남 #모임 #회식</Text>
@@ -67,7 +53,7 @@ class ShopDetail extends Component {
                             </View>
 
                             <TouchableWithoutFeedback2 onPress={() => {
-                                this.setState({visibleModal: 1})
+                                this.handleToggleModal(true)
                                 // this.loadModal()
                                 // this.setState({visibleModal:true});
                             }}>
@@ -87,11 +73,23 @@ class ShopDetail extends Component {
                                 </View>
                             </TouchableWithoutFeedback2>
                         </CardItem>
-                        {/*<Modals visible={this.state.visibleModal}/>*/}
 
 
-                        <Modal isVisible={this.state.visibleModal === 1} style={styles.modal}>
-                            {this.renderModalContent()}
+                        <Modal isVisible={visibleModal === true} style={styles.modal}>
+                            <View style={styles.modalContent}>
+                                <Text>식당에 전화하시겠습니까?</Text>
+                                <View style={styles.buttonContainer}>
+                                    <Button transparent dark onPress={() => this.handleToggleModal(false) }
+                                            style={styles.buttonCancel}>
+                                        <Text style={styles.cardSubText}>취소하기</Text>
+                                    </Button>
+                                    <Button transparent dark
+                                            onPress={() => Linking.openURL('tel:010-1234-5678').then(this.handleToggleModal(false))}
+                                            style={styles.buttonCall}>
+                                        <Text style={styles.cardSubText}>전화하기</Text>
+                                    </Button>
+                                </View>
+                            </View>
                         </Modal>
 
 
@@ -105,8 +103,7 @@ class ShopDetail extends Component {
                             <Image source={{uri: this.state.uri2}} style={styles.image}/>
                         </CardItem>
                         <CardItem>
-                            <Text style={styles.cardSubText}>조선횟집 여의도지점은 제절회 모둠 1인을 잘하는 베스트 맛집으로 회식, 모임, 데이트, 추천
-                                맛집입니다.</Text>
+                            <Text style={styles.cardSubText}>{shopIntroduction}</Text>
                         </CardItem>
                         <CardItem>
                             <Text style={styles.margin2}>
@@ -207,4 +204,15 @@ const styles = StyleSheet.create({
 
 });
 
-export default ShopDetail;
+export default connect(
+    (state)=>({
+        shopNames: state.shop.get('selectedShop'),
+        shopUri : state.shop.get('selectedShopUri'),
+        shopIntroduction : state.shop.get('selectedShopIntroduction'),
+        visibleModal : state.shop.get("visibleModal")
+
+    }),
+    (dispatch)=>({
+        ShopActions:bindActionCreators(shopActions, dispatch)
+    })
+) (ShopDetail);

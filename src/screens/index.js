@@ -10,6 +10,7 @@ import ReservationCompleteScreen from './reservation/ReservationCompleteScreen';
 import ContactListScreen from './contactlist/ContactListScreen';
 import MyPageScreen from './myPage/MyPageScreen';
 import MyPageReservationConfirmScreen from './myPage/MyPageReservationConfirmScreen';
+import MyPageReservationHistoryScreen from './myPage/MyPageReservationHistoryScreen';
 import LoginScreen from './login/LoginScreen';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -83,6 +84,9 @@ class Index extends Component {
                                icon={tabBarIcon}>
                             <Scene key='myPageScreen' component={MyPageScreen} title='마이페이지'/>
                             <Scene key='myPageReservationConfirmScreen' component={MyPageReservationConfirmScreen} title='예약확인' backTitle=" "
+                                   headerTintColor="#000"
+                            />
+                            <Scene key='myPageReservationHistoryScreen' component={MyPageReservationHistoryScreen} title='지난예약' backTitle=" "
                                    headerTintColor="#000"
                             />
                         </Scene>

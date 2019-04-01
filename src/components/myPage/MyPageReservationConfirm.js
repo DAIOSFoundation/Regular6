@@ -6,111 +6,100 @@ import {
     ScrollView,
 
 } from 'react-native';
-import {Button} from 'native-base';
+import {Button, Spinner} from 'native-base';
+import {connect} from 'react-redux';
+import {bindActionCreators} from "redux";
+import * as myPageReservationConfirmActions from '../../store/modules/myPage/myPage';
+import NothingToShow from "../../components/common/FixedAlert";
+
 class MyPageReservationConfirm extends Component {
+
+    initialize = async () => {
+        const {MyPageReservationConfirmActions} = this.props;
+        try {
+            await MyPageReservationConfirmActions.read_myReservation()
+        } catch (e) {
+
+            console.log("myPageReservationConfirm error : ", e)
+        }
+
+    }
+
+    componentDidMount() {
+        this.initialize()
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        // return false 하면 업데이트를 안함
+        return this.props.reservationData !== nextProps.reservationData
+    }
+
     render() {
-        return (
-            <ScrollView>
-                <View style={styles.cardContainer}>
+        const {reservationData, loading} = this.props;
+        if (loading === undefined || loading === false) return <Spinner color="black" style={styles.spinner}/>;
+        console.log("reservationData : ",reservationData[0]);
+        if (reservationData[0].length!==0) {
+            return (
+                <ScrollView>
+                    {
+                        reservationData[0].map((item, index) => (
+                                <View style={styles.cardContainer} key={index}>
+                                    <View style={styles.card}>
+                                        <Text style={styles.reservationTitle}>{item.user_name}</Text>
 
-                    {/*ㅇㅖ약확인*/}
-                    <View style={styles.card}>
-                        <Text style={styles.reservationTitle}>예약자_01034568976</Text>
+                                        <View style={styles.cardContent}>
+                                            <View style={styles.cardLeft}>
+                                                <Text style={styles.cardLeftLabel}>장소</Text>
+                                                <Text style={styles.reservationLabel}>{item.place}</Text>
+                                            </View>
 
-                        <View style={styles.cardContent}>
-                            <View style={styles.cardLeft}>
-                                <Text style={styles.cardLeftLabel}>장소</Text>
-                                <Text style={styles.reservationLabel}>평화옥</Text>
-                            </View>
+                                            <View style={styles.cardRight}>
+                                                <Text style={styles.cardLeftLabel}>날짜</Text>
+                                                <Text style={styles.reservationLabel}>{item.date}</Text>
+                                            </View>
+                                        </View>
 
-                            <View style={styles.cardRight}>
-                                <Text style={styles.cardLeftLabel}>날짜</Text>
-                                <Text style={styles.reservationLabel}>2019.05.10</Text>
-                            </View>
-                        </View>
+                                        <View style={styles.cardContent}>
+                                            <View style={styles.cardLeft}>
+                                                <Text style={styles.cardLeftLabel}>시간</Text>
+                                                <Text style={styles.reservationLabel}>{item.time}</Text>
+                                            </View>
 
-                        <View style={styles.cardContent}>
-                            <View style={styles.cardLeft}>
-                                <Text style={styles.cardLeftLabel}>시간</Text>
-                                <Text style={styles.reservationLabel}>17:00</Text>
-                            </View>
+                                            <View style={styles.cardRight}>
+                                                <Text style={styles.cardLeftLabel}>인원</Text>
+                                                <Text style={styles.reservationLabel}>{item.number}</Text>
+                                            </View>
+                                        </View>
 
-                            <View style={styles.cardRight}>
-                                <Text style={styles.cardLeftLabel}>인원</Text>
-                                <Text style={styles.reservationLabel}>어른 7</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.cardFooter}>
-                            <View style={styles.cardLeft}>
-                                <Text style={styles.cardLeftReqLabel}>요청사항</Text>
-                                <Text style={styles.reservationLabel}>룸으로 예약</Text>
-                            </View>
-                        </View>
-
-
-                        <View style={styles.cardFooterButton}>
-                            <Button bordered block style={styles.reservationEditBtn}>
-                                <Text style={styles.reservationEditText}>예약수정</Text>
-                            </Button>
-
-                            <Button bordered block style={styles.reservationCancelBtn}>
-                                <Text style={styles.reservationCancelText}>예약취소</Text>
-                            </Button>
-                        </View>
-                    </View>
+                                        <View style={styles.cardFooter}>
+                                            <View style={styles.cardLeft}>
+                                                <Text style={styles.cardLeftReqLabel}>요청사항</Text>
+                                                <Text style={styles.reservationLabel}>{item.request}</Text>
+                                            </View>
+                                        </View>
 
 
-                    <View style={styles.card}>
-                        <Text style={styles.reservationTitle}>예약자_01034568976</Text>
+                                        <View style={styles.cardFooterButton}>
+                                            <Button bordered block style={styles.reservationEditBtn}>
+                                                <Text style={styles.reservationEditText}>예약수정</Text>
+                                            </Button>
 
-                        <View style={styles.cardContent}>
-                            <View style={styles.cardLeft}>
-                                <Text style={styles.cardLeftLabel}>장소</Text>
-                                <Text style={styles.reservationLabel}>평화옥</Text>
-                            </View>
-
-                            <View style={styles.cardRight}>
-                                <Text style={styles.cardLeftLabel}>날짜</Text>
-                                <Text style={styles.reservationLabel}>2019.05.10</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.cardContent}>
-                            <View style={styles.cardLeft}>
-                                <Text style={styles.cardLeftLabel}>시간</Text>
-                                <Text style={styles.reservationLabel}>17:00</Text>
-                            </View>
-
-                            <View style={styles.cardRight}>
-                                <Text style={styles.cardLeftLabel}>인원</Text>
-                                <Text style={styles.reservationLabel}>어른 7</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.cardFooter}>
-                            <View style={styles.cardLeft}>
-                                <Text style={styles.cardLeftReqLabel}>요청사항</Text>
-                                <Text style={styles.reservationLabel}>룸으로 예약</Text>
-                            </View>
-                        </View>
-
-
-                        <View style={styles.cardFooterButton}>
-                            <Button bordered block style={styles.reservationEditBtn}>
-                                <Text style={styles.reservationEditText}>예약수정</Text>
-                            </Button>
-
-                            <Button bordered block style={styles.reservationCancelBtn}>
-                                <Text style={styles.reservationCancelText}>예약취소</Text>
-                            </Button>
-                        </View>
-                    </View>
-
-
-                </View>
-            </ScrollView>
-        )
+                                            <Button bordered block style={styles.reservationCancelBtn}>
+                                                <Text style={styles.reservationCancelText}>예약취소</Text>
+                                            </Button>
+                                        </View>
+                                    </View>
+                                </View>
+                            )
+                        )
+                    }
+                </ScrollView>
+            )
+        }else{
+            return(
+                <NothingToShow  icon="alert-circle-outline" text1="예약한 내용이" text2="없습니다."/>
+            )
+        }
     }
 }
 
@@ -118,7 +107,6 @@ const styles = StyleSheet.create({
     /******** card **************/
     cardContainer: {
         backgroundColor: "#d8d8d8",
-        paddingBottom: 300,
     },
     card: {
         // marginVertical: 8,
@@ -182,10 +170,12 @@ const styles = StyleSheet.create({
     },
     cardLeftLabel: {
         marginRight: 38,
+        color:'rgba(32, 33, 35, 0.6)'
 
     },
     cardLeftReqLabel: {
         marginRight: 14,
+        color:'rgba(32, 33, 35, 0.6)'
 
     },
     reservationEditBtn: {
@@ -232,15 +222,26 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     reservationLabel: {
-        marginLeft: 8,
-        // alignSelf: 'flex-end',
-        // justifyContent: 'center',
+        color: '#202123'
     },
     reservationTitle: {
         fontSize: 16,
         marginLeft: 8,
         color: "#000000",
         fontWeight: '600',
+    },
+    spinner: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
     }
 });
-export default MyPageReservationConfirm;
+export default connect(
+    (state) => ({
+        reservationData: state.myPage.get('reservationData'),
+        loading: state.pender.pending['myPageReservationConfirm/READ_MY_RESERVATION']
+    }),
+    (dispatch) => ({
+        MyPageReservationConfirmActions: bindActionCreators(myPageReservationConfirmActions, dispatch)
+    })
+)(MyPageReservationConfirm);
