@@ -10,10 +10,10 @@ import MyPageReservationConfirm from "../myPage/MyPageReservationConfirm";
  */
 
 const FBSDK = require('react-native-fbsdk');
-
+const GlobalStore = require('../common/GlobalStore');
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, TouchableHighlight, AppRegistry, Alert, NativeModules,} from 'react-native';
+import {Platform, StyleSheet, Text, View, TouchableHighlight, AppRegistry, Alert, NativeModules} from 'react-native';
 import RNKakaoLogins from 'react-native-kakao-logins';
 import NativeButton from 'apsl-react-native-button';
 
@@ -55,6 +55,8 @@ class LoginPage extends Component<Props> {
   // 카카오 로그인 시작.
   kakaoLogin() {
     console.log('   kakaoLogin   ');
+
+
     RNKakaoLogins.login((err, result) => {
       if (err) {
         console.log("result->", err)
@@ -63,12 +65,13 @@ class LoginPage extends Component<Props> {
       }
       console.log("result->", result)
       this.getProfile()
-      // Alert.alert('result', result);
     });
   }
 
   facebookLogin() {
     console.log('   facebookLogin   ');
+
+    this.setStoreData(key, value)
 
     LoginManager.logInWithReadPermissions(['public_profile']).then(
       function (result) {
@@ -88,7 +91,10 @@ class LoginPage extends Component<Props> {
                   alert('Error fetching data: ' + error.toString());
                 } else {
                   console.log(result)
-                  // console.log(result.user_photos)
+
+                  let key = "isCheckLogin"
+                  let value = "true"
+                  GlobalStore.setStoreData(key, value)
 
                 }
               }
@@ -121,6 +127,9 @@ class LoginPage extends Component<Props> {
 
   kakaoLogout() {
     console.log('   kakaoLogout   ');
+    let key = "isCheckLogin"
+    let value = "false"
+    GlobalStore.setStoreData(key, value)
     RNKakaoLogins.logout((err, result) => {
       if (err) {
         console.log("err->", err)
@@ -134,6 +143,9 @@ class LoginPage extends Component<Props> {
   // 로그인 후 내 프로필 가져오기.
   getProfile() {
     console.log('getKakaoProfile');
+    // let key = "isKakaoLogin"
+    // GlobalStore.getStoreData(key)
+
     RNKakaoLogins.getProfile((err, result) => {
       if (err) {
         console.log("result->", err)
@@ -141,6 +153,10 @@ class LoginPage extends Component<Props> {
         return;
       }
       console.log("result->", result)
+
+      let key = "isCheckLogin"
+      let value = "true"
+      GlobalStore.setStoreData(key, value)
     });
   }
 
@@ -159,7 +175,6 @@ class LoginPage extends Component<Props> {
             style={styles.btnKakaoLogin}
             textStyle={styles.txtKakaoLogin}
           >카카오톡으로 시작하기</NativeButton>
-          {/*<Text>{this.state.token}</Text>*/}
           {/*<NativeButton*/}
           {/*onPress={() => this.kakaoLogout()}*/}
           {/*activeOpacity={0.5}*/}
