@@ -13,7 +13,9 @@ const FBSDK = require('react-native-fbsdk');
 
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, TouchableHighlight, AppRegistry} from 'react-native';
+import {Platform, StyleSheet, Text, View, TouchableHighlight, AppRegistry, Alert, NativeModules,} from 'react-native';
+import RNKakaoLogins from 'react-native-kakao-logins';
+import NativeButton from 'apsl-react-native-button';
 
 const {LoginButton, ShareDialog, AccessToken, GraphRequest, GraphRequestManager} = FBSDK;
 const instructions = Platform.select({
@@ -40,13 +42,87 @@ class LoginPage extends Component<Props> {
     this.state = {
       shareLinkContent: shareLinkContent,
       facebookId: "",
-      accessToken: ""
+      accessToken: "",
+      isKakaoLogging: false,
+      token: 'token has not fetched',
     };
+    if (!RNKakaoLogins) {
+      console.log('Not Linked');
+    }
+  }
+
+  // 카카오 로그인 시작.
+  kakaoLogin() {
+    console.log('   kakaoLogin   ');
+    RNKakaoLogins.login((err, result) => {
+      if (err){
+        console.log("result->", err)
+        // Alert.alert('error', err);
+        return;
+      }
+      console.log("result->", result)
+      // Alert.alert('result', result);
+    });
+  }
+
+  kakaoLogout() {
+    console.log('   kakaoLogout   ');
+    RNKakaoLogins.logout((err, result) => {
+      if (err){
+        console.log("err->", err)
+        // Alert.alert('error', err);
+        return;
+      }
+      console.log("result->", result)
+    });
+  }
+
+  // 로그인 후 내 프로필 가져오기.
+  getProfile() {
+    console.log('getKakaoProfile');
+    RNKakaoLogins.getProfile((err, result) => {
+      if (err){
+        console.log("result->", err)
+        // Alert.alert('error', err);
+        return;
+      }
+      console.log("result->", result)
+    });
   }
 
   render() {
     return (
       <View style={styles.container}>
+
+        {/*kakaotalk login*/}
+        <View style={ styles.header }>
+          <Text>LOGIN</Text>
+        </View>
+        <View style={ styles.content }>
+          <NativeButton
+            isLoading={this.state.isNaverLoggingin}
+            onPress={() => this.kakaoLogin()}
+            activeOpacity={0.5}
+            style={styles.btnKakaoLogin}
+            textStyle={styles.txtNaverLogin}
+          >LOGIN</NativeButton>
+          <Text>{this.state.token}</Text>
+          <NativeButton
+            onPress={() => this.kakaoLogout()}
+            activeOpacity={0.5}
+            style={styles.btnKakaoLogin}
+            textStyle={styles.txtNaverLogin}
+          >Logout</NativeButton>
+          <NativeButton
+            isLoading={this.state.isKakaoLogging}
+            onPress={() => this.getProfile()}
+            activeOpacity={0.5}
+            style={styles.btnKakaoLogin}
+            textStyle={styles.txtNaverLogin}
+          >getProfile</NativeButton>
+        </View>
+
+        {/*facebook login*/}
         <LoginButton
           logInWithReadPermissions={["public_profile"]}
           onLoginFinished={
@@ -113,10 +189,15 @@ class LoginPage extends Component<Props> {
 
 const styles = StyleSheet.create({
   container: {
+    // flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // backgroundColor: '#F5FCFF',
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    flexDirection: 'column',
+    marginTop: Platform.OS === 'ios' ? 0 : 24,
+    paddingTop: Platform.OS === 'ios' ? 24 : 0,
+    backgroundColor: 'white',
   },
   welcome: {
     fontSize: 20,
@@ -127,6 +208,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
+  },
+
+  // kakao
+  header: {
+    flex: 8.8,
+    flexDirection: 'row',
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  content: {
+    flex: 87.5,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignSelf: 'stretch',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  btnKakaoLogin: {
+    height: 48,
+    width: 240,
+    alignSelf: 'center',
+    backgroundColor: '#F8E71C',
+    borderRadius: 0,
+    borderWidth: 0,
+  },
+  txtNaverLogin: {
+    fontSize: 16,
+    color: '#3d3d3d',
   },
 });
 

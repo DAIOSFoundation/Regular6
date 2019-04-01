@@ -134,6 +134,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-kakao-logins')
+//    implementation project(':react-native-kakao-login')
     implementation project(':react-native-fbsdk')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-svg')

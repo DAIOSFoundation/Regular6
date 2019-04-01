@@ -46,8 +46,8 @@ class Index extends Component {
                         <Scene key='Home' title='Home'
                                icon={tabBarIcon}
                         >
-                            {/*<Scene key='LoginScreen' component={LoginScreen} title='레귤러식스'/>*/}
-                            <Scene key='homeScreen' component={HomeScreen} title='레귤러식스'/>
+                            <Scene key='LoginScreen' component={LoginScreen} title='레귤러식스'/>
+                            {/*<Scene key='homeScreen' component={HomeScreen} title='레귤러식스'/>*/}
                             <Scene key='homeDetailScreen' component={HomeDetailScreen} title='레귤러식스' backTitle=" "
                                    hideTabBar={true}
                                    headerTintColor="#000"
