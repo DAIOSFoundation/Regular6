@@ -17,7 +17,7 @@ import {Platform, StyleSheet, Text, View, TouchableHighlight, AppRegistry, Alert
 import RNKakaoLogins from 'react-native-kakao-logins';
 import NativeButton from 'apsl-react-native-button';
 
-const {LoginButton, ShareDialog, AccessToken, GraphRequest, GraphRequestManager} = FBSDK;
+const {LoginButton, ShareDialog, AccessToken, GraphRequest, GraphRequestManager, LoginManager} = FBSDK;
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
   android:
@@ -30,6 +30,7 @@ const instructions = Platform.select({
 // }
 
 type Props = {};
+
 class LoginPage extends Component<Props> {
 
   constructor(props) {
@@ -55,20 +56,73 @@ class LoginPage extends Component<Props> {
   kakaoLogin() {
     console.log('   kakaoLogin   ');
     RNKakaoLogins.login((err, result) => {
-      if (err){
+      if (err) {
         console.log("result->", err)
         // Alert.alert('error', err);
         return;
       }
       console.log("result->", result)
+      this.getProfile()
       // Alert.alert('result', result);
     });
+  }
+
+  facebookLogin() {
+    console.log('   facebookLogin   ');
+
+    LoginManager.logInWithReadPermissions(['public_profile']).then(
+      function (result) {
+        if (result.isCancelled) {
+          console.log('Login cancelled')
+        } else {
+          console.log('Login success with permissions: ' + result.grantedPermissions.toString())
+          AccessToken.getCurrentAccessToken().then(
+            (data) => {
+
+              let accessToken = data.accessToken
+              console.log('accessToken=> ', accessToken.toString())
+
+              const responseInfoCallback = (error, result) => {
+                if (error) {
+                  console.log(error)
+                  alert('Error fetching data: ' + error.toString());
+                } else {
+                  console.log(result)
+                  // console.log(result.user_photos)
+
+                }
+              }
+
+              const infoRequest = new GraphRequest(
+                '/me',
+                {
+                  accessToken: accessToken,
+                  parameters: {
+                    fields: {
+                      string: 'email,name,first_name,middle_name,last_name, cover,picture.type(large)'
+                    }
+                  }
+                },
+                responseInfoCallback
+              );
+
+              // Start the graph request.
+              new GraphRequestManager().addRequest(infoRequest).start()
+
+
+            })
+        }
+      },
+      function (error) {
+        console.log('Login fail with error: ' + error)
+      }
+    )
   }
 
   kakaoLogout() {
     console.log('   kakaoLogout   ');
     RNKakaoLogins.logout((err, result) => {
-      if (err){
+      if (err) {
         console.log("err->", err)
         // Alert.alert('error', err);
         return;
@@ -81,7 +135,7 @@ class LoginPage extends Component<Props> {
   getProfile() {
     console.log('getKakaoProfile');
     RNKakaoLogins.getProfile((err, result) => {
-      if (err){
+      if (err) {
         console.log("result->", err)
         // Alert.alert('error', err);
         return;
@@ -95,93 +149,58 @@ class LoginPage extends Component<Props> {
       <View style={styles.container}>
 
         {/*kakaotalk login*/}
-        <View style={ styles.header }>
-          <Text>LOGIN</Text>
+        <View style={styles.header}>
+          <Text>Regular Six Logo</Text>
         </View>
-        <View style={ styles.content }>
+        <View style={styles.content}>
           <NativeButton
-            isLoading={this.state.isNaverLoggingin}
             onPress={() => this.kakaoLogin()}
             activeOpacity={0.5}
             style={styles.btnKakaoLogin}
-            textStyle={styles.txtNaverLogin}
-          >LOGIN</NativeButton>
-          <Text>{this.state.token}</Text>
+            textStyle={styles.txtKakaoLogin}
+          >카카오톡으로 시작하기</NativeButton>
+          {/*<Text>{this.state.token}</Text>*/}
+          {/*<NativeButton*/}
+          {/*onPress={() => this.kakaoLogout()}*/}
+          {/*activeOpacity={0.5}*/}
+          {/*style={styles.btnKakaoLogin}*/}
+          {/*textStyle={styles.txtNaverLogin}*/}
+          {/*>Logout</NativeButton>*/}
+          {/*<NativeButton*/}
+          {/*isLoading={this.state.isKakaoLogging}*/}
+          {/*onPress={() => this.getProfile()}*/}
+          {/*activeOpacity={0.5}*/}
+          {/*style={styles.btnKakaoLogin}*/}
+          {/*textStyle={styles.txtNaverLogin}*/}
+          {/*>getProfile</NativeButton>*/}
+
+
+          {/*facebook login*/}
           <NativeButton
-            onPress={() => this.kakaoLogout()}
+            onPress={() => this.facebookLogin()}
             activeOpacity={0.5}
-            style={styles.btnKakaoLogin}
-            textStyle={styles.txtNaverLogin}
-          >Logout</NativeButton>
-          <NativeButton
-            isLoading={this.state.isKakaoLogging}
-            onPress={() => this.getProfile()}
-            activeOpacity={0.5}
-            style={styles.btnKakaoLogin}
-            textStyle={styles.txtNaverLogin}
-          >getProfile</NativeButton>
+            style={styles.btnFacebookLogin}
+            textStyle={styles.txtFacebookLogin}
+          >페이스북으로 시작하기</NativeButton>
+
+          {/*<LoginButton*/}
+            {/*logInWithReadPermissions={["public_profile"]}*/}
+            {/*onLoginFinished={*/}
+              {/*(error, result) => {*/}
+                {/*if (error) {*/}
+                  {/*console.log("login has error: " + result.error);*/}
+                {/*} else if (result.isCancelled) {*/}
+                  {/*console.log("login is cancelled.");*/}
+                {/*} else {*/}
+                  {/*console.log('result=>', result)*/}
+
+                {/*}*/}
+              {/*}*/}
+            {/*}*/}
+            {/*onLogoutFinished={() => console.log("logout.")}*/}
+          {/*/>*/}
+
         </View>
-
-        {/*facebook login*/}
-        <LoginButton
-          logInWithReadPermissions={["public_profile"]}
-          onLoginFinished={
-            (error, result) => {
-              if (error) {
-                console.log("login has error: " + result.error);
-              } else if (result.isCancelled) {
-                console.log("login is cancelled.");
-              } else {
-                console.log('result=>', result)
-                AccessToken.getCurrentAccessToken().then(
-                  (data) => {
-
-                    let accessToken = data.accessToken
-                    console.log('accessToken=> ', accessToken.toString())
-
-                    const responseInfoCallback = (error, result) => {
-                      if (error) {
-                        console.log(error)
-                        alert('Error fetching data: ' + error.toString());
-                      } else {
-                        console.log(result)
-                        console.log(result.user_photos)
-                        this.setState({
-                          facebookId: result.id,
-                          accessToken: accessToken.toString()
-                        })
-
-                        console.log('update state => ', this.state.facebookId)
-                        // alert('Success fetching data: ' + result.toString());
-
-
-                      }
-                    }
-
-                    const infoRequest = new GraphRequest(
-                      '/me',
-                      {
-                        accessToken: accessToken,
-                        parameters: {
-                          fields: {
-                            string: 'email,name,first_name,middle_name,last_name, cover,picture.type(large)'
-                          }
-                        }
-                      },
-                      responseInfoCallback
-                    );
-
-                    // Start the graph request.
-                    new GraphRequestManager().addRequest(infoRequest).start()
-
-
-                  }
-                )
-              }
-            }
-          }
-          onLogoutFinished={() => console.log("logout.")}
-        />
       </View>
     );
   }
@@ -233,14 +252,33 @@ const styles = StyleSheet.create({
     height: 48,
     width: 240,
     alignSelf: 'center',
-    backgroundColor: '#F8E71C',
+    backgroundColor: '#fae100',
     borderRadius: 0,
     borderWidth: 0,
   },
+  btnFacebookLogin: {
+    height: 48,
+    width: 240,
+    alignSelf: 'center',
+    backgroundColor: '#2d4485',
+    borderRadius: 0,
+    borderWidth: 0,
+  },
+  txtKakaoLogin: {
+    fontSize: 16,
+    color: '#202123',
+  },
+  txtFacebookLogin: {
+    fontSize: 16,
+    color: '#ffffff',
+  },
   txtNaverLogin: {
     fontSize: 16,
-    color: '#3d3d3d',
+    color: '#ffffff',
   },
+
+
+
 });
 
 export default LoginPage;
