@@ -9,7 +9,6 @@
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
-#import <KakaoOpenSDK/KakaoOpenSDK.h>
 
 @implementation AppDelegate
 
@@ -31,30 +30,6 @@
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   return YES;
-}
-
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
-  sourceApplication:(NSString *)sourceApplication
-         annotation:(id)annotation {
-  if ([KOSession isKakaoAccountLoginCallback:url]) {
-    return [KOSession handleOpenURL:url];
-  }
-  
-  return false;
-}
-
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
-            options:(NSDictionary<NSString *,id> *)options {
-  if ([KOSession isKakaoAccountLoginCallback:url]) {
-    return [KOSession handleOpenURL:url];
-  }
-  
-  return false;
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
-  [KOSession handleDidBecomeActive];
 }
 
 @end
