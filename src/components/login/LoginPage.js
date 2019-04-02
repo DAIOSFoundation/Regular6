@@ -71,8 +71,6 @@ class LoginPage extends Component<Props> {
   facebookLogin() {
     console.log('   facebookLogin   ');
 
-    this.setStoreData(key, value)
-
     LoginManager.logInWithReadPermissions(['public_profile']).then(
       function (result) {
         if (result.isCancelled) {
