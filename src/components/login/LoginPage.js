@@ -16,6 +16,10 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, TouchableHighlight, AppRegistry, Alert, NativeModules} from 'react-native';
 import RNKakaoLogins from 'react-native-kakao-logins';
 import NativeButton from 'apsl-react-native-button';
+import {bindActionCreators} from "redux";
+import {Actions} from "react-native-router-flux";
+import {connect} from "react-redux";
+import * as loginActions from "../../store/modules/login/loginPage";
 
 const {LoginButton, ShareDialog, AccessToken, GraphRequest, GraphRequestManager, LoginManager} = FBSDK;
 const instructions = Platform.select({
@@ -52,6 +56,15 @@ class LoginPage extends Component<Props> {
     }
   }
 
+  handleSetLogin = (login) => {
+    const {LoginActions} = this.props;
+    LoginActions.set_login(login)
+  }
+  handleSendServer = async (login) => {
+    const {LoginActions} = this.props;
+    await LoginActions.create_user(login)
+  }
+
   // 카카오 로그인 시작.
   kakaoLogin() {
     console.log('   kakaoLogin   ');
@@ -64,7 +77,7 @@ class LoginPage extends Component<Props> {
         return;
       }
       console.log("result->", result)
-      this.getProfile()
+      this.getProfile(result.token.toString())
     });
   }
 
@@ -86,13 +99,28 @@ class LoginPage extends Component<Props> {
               const responseInfoCallback = (error, result) => {
                 if (error) {
                   console.log(error)
-                  alert('Error fetching data: ' + error.toString());
+                  // Alert.alert('Error fetching data: ' + error.toString());
                 } else {
                   console.log(result)
 
                   let key = "isCheckLogin"
                   let value = "true"
                   GlobalStore.setStoreData(key, value)
+
+                  let data = {}
+                  data.platformId = result.id;
+                  data.email = result.email;
+                  data.profile_img = result.picture.data.url;
+                  data.login_platform = "facebook";
+                  data.isCheckLogin = true;
+                  data.accessToken = accessToken.toString();
+
+                  console.log('data=>', data);
+                  this.handleSetLogin(data);
+
+                  Actions.popTo('MyPage');
+                  Actions.jump('MyPage')
+
 
                 }
               }
@@ -139,7 +167,7 @@ class LoginPage extends Component<Props> {
   }
 
   // 로그인 후 내 프로필 가져오기.
-  getProfile() {
+  getProfile(accessToken) {
     console.log('getKakaoProfile');
     // let key = "isKakaoLogin"
     // GlobalStore.getStoreData(key)
@@ -155,6 +183,23 @@ class LoginPage extends Component<Props> {
       let key = "isCheckLogin"
       let value = "true"
       GlobalStore.setStoreData(key, value)
+
+      let data = {}
+      data.platformId = result.id;
+      data.email = '';
+      // data.email = result.email != undefined ? result.email:result.email, '';
+      data.profile_img = result.profile_image_path;
+      data.login_platform = "kakaotalk";
+      data.isCheckLogin = true;
+      data.accessToken = accessToken;
+
+      console.log('data=>', data);
+      this.handleSetLogin(data);
+      // this.handleSendServer(data);
+
+      Actions.popTo('MyPage');
+      Actions.jump('MyPage')
+
     });
   }
 
@@ -294,4 +339,19 @@ const styles = StyleSheet.create({
 
 });
 
-export default LoginPage;
+export default connect(
+  (state) => ({
+    platformId: state.login.get("platformId"),
+    email: state.login.get('email'),
+    profile_img: state.login.get("profile_img"),
+    login_platform: state.login.get('login_platform'),
+    isCheckLogin: state.login.get("isCheckLogin"),
+    phone_number: state.login.get("phone_number"),
+    accessToken: state.login.get("accessToken"),
+  }),
+  (dispatch) => ({
+    LoginActions: bindActionCreators(loginActions, dispatch)
+  })
+)(LoginPage);
+
+// export default LoginPage;
